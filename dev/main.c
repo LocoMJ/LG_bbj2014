@@ -1,4 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <gb/gb.h>
+#include <gb/console.h>
 #include "engine.c"
 
 #define PERFRAME 34 // milliseconds per iteration (34)
@@ -73,6 +76,8 @@ void recordinput(int key) {
 
 /* main program */
 void main() {
+
+	loadbkg();
 
 	loadsprites();
 

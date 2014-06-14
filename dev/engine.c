@@ -1,28 +1,79 @@
 #include "sprites.c"
+#include "tiles.c"
 
 typedef enum {false, true} bool;
+
+const int JUMPFORCE = 3;
+
+bool apressed;
 
 struct player {
 	int x; // x axis position of the sprite
 	int y; // y axis position of the sprite
 	int frame; // actual frame
 	int totalframes; // frames of the animation
+	bool inair;
 };
 
 static struct player philip;
 
 int disx = 0; // x axis displacement of the sprite
 int disy = 0; // y axis displacement of the sprite
+int disjump = 0; // jump distance
 
 int framecounter = 0; // iterations per frame
 const int ITERPFRAME = 5;
 
+int jumpcounter = 0; // iterations per jump aceleration
+const int ITERPJUMP = 3;
+
 void movesprites() {
 
-	philip.x += disx;
-	philip.y += disy;
+	if (philip.inair) {
+		disy += disjump;
 
-	move_sprite(0, philip.x, philip.y);
+		jumpcounter++;
+
+		if (jumpcounter >= ITERPJUMP) {
+			disjump += 1;
+			jumpcounter = 0;
+		}
+
+		if (disjump > JUMPFORCE) {
+			disjump = 0;
+			philip.inair = false;
+			philip.frame = 2;
+			jumpcounter = 0;
+			framecounter = 0;
+		}
+	}
+
+	if (disx >= 0) 
+		philip.x += disx;
+	else
+		philip.x -= -disx;
+
+	if (disy >=0)
+		philip.y += disy;
+	else
+		philip.y -= -disy;
+
+
+	if (philip.x < 1 || philip.x > 151) {
+		if (disx >=0)
+			philip.x -= disx;
+		else
+			philip.x += -disx;
+	}	
+
+	if (philip.y > 127) {
+		if (disy >=0)
+			philip.y -= disy;
+		else
+			philip.y += -disy;
+	}
+
+	move_sprite(0, philip.x + 8, philip.y + 16);
 
 }
 
@@ -39,6 +90,17 @@ void animatesprites() {
 		framecounter = 0;
 	}
 
+	if (philip.inair)
+		philip.frame = 0;
+
+}
+
+void drawbkg() {
+	int i, j;
+
+	for (i = 0; i < 20; i++)
+		for (j = 0; j < 13; j++)
+			set_bkg_tiles(i, j, 1, 1, track);
 }
 
 void drawsprites() {
@@ -49,6 +111,15 @@ void drawsprites() {
 	animatesprites();
 }
 
+void loadbkg() {
+
+	set_bkg_data(1, 1, bkgdata);
+
+	drawbkg();
+
+	SHOW_BKG;
+}
+
 void loadsprites() {
 
 	SPRITES_8x16;
@@ -57,8 +128,9 @@ void loadsprites() {
 
 	philip.x = 40;
 	philip.y = 120;
-	philip.frame = 0;
+	philip.frame = 2;
 	philip.totalframes = 4;
+	philip.inair = false;
 
 	drawsprites();
 
@@ -78,11 +150,25 @@ void processinput(bool* keys) {
 	}
 
 	if (keys[2]) { // up
-		disy = - 1;
+		if (philip.y >= 92)
+			disy = - 1;
+		else
+			disy = 0;
 	}
 
 	if (keys[3]) { // down
 		disy = 1;
+	}
+
+	if (keys[4]) { // a
+		if (!philip.inair && !apressed) {
+			philip.inair = true;
+			disjump = - JUMPFORCE;
+		}
+
+		apressed = true;
+	} else {
+		apressed = false;
 	}
 
 	if (!keys[0] && !keys[1]) {
