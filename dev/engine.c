@@ -19,11 +19,29 @@ struct player {
 
 static struct player philip;
 
+struct enemy {
+	int x;
+	int y;
+	int frame;
+	int totalframes;
+	int drop;
+	bool left;
+	int bombx;
+	int bomby;
+	bool exploding;
+}
+
+static struct enemy airenemy;
+
+int bombframe = 28;
+
 int disx = 0; // x axis displacement of the sprite
 int disy = 0; // y axis displacement of the sprite
 int disjump = 0; // jump distance
 
 int framecounter = 0; // iterations per frame
+int enframecounter = 0;
+int explosioncounter = 0;
 const int ITERPFRAME = 5;
 
 int jumpcounter = 0; // iterations per jump aceleration
@@ -80,6 +98,24 @@ void movesprites() {
 	
 	move_sprite(1, philip.x + 8, philip.realy + 17);
 
+	move_sprite(2, airenemy.x + 8, airenemy.y + 17);
+	move_sprite(3, airenemy.x + 16, airenemy.y + 17);
+
+	if (airenemy.drop == 0) {
+		airenemy.bombx = airenemy.x;
+		airenemy.bomby = airenemy.y;
+	} else if (!airenemy.exploding) {
+		airenemy.bomby += 2;
+
+		if (airenemy.bomby > 108) {
+			airenemy.exploding = true;
+			airenemy.bomby += 4;
+		}
+	} else {
+		airenemy.bombx -= SPEED * 3;
+	}
+
+	move_sprite(4, airenemy.bombx + 12, airenemy.bomby + 17);
 }
 
 void animatesprites() {
@@ -95,6 +131,32 @@ void animatesprites() {
 		framecounter = 0;
 	}
 
+	enframecounter++;
+
+	if (enframecounter >= ITERPFRAME) {
+		airenemy.frame += 4;
+
+		if (airenemy.frame >= airenemy.totalframes)
+			airenemy.frame = 8;
+
+		enframecounter = 0;
+	}
+
+	if (airenemy.exploding) {
+		explosioncounter++;
+
+		if (explosioncounter >= ITERPFRAME) {
+			bombframe += 2;
+			if (bombframe >= 34) {
+				bombframe = 28;
+				airenemy.exploding = false;
+				airenemy.drop = false;
+			}
+
+			explosioncounter = 0;
+		}
+	}
+
 	if (philip.inair)
 		philip.frame = 0;
 
@@ -104,8 +166,11 @@ void drawbkg() {
 	int i, j;
 
 	for (i = 0; i < 32; i++)
-		for (j = 0; j < 13; j++)
+		for (j = 4; j < 12; j++)
 			set_bkg_tiles(i, j, 1, 1, track);
+
+	for (i = 0; i < 32; i++)	
+		set_bkg_tiles(i, 12, 1, 1, borde);
 }
 
 void drawsprites() {
@@ -117,13 +182,23 @@ void drawsprites() {
 	else
 		set_sprite_tile(1, 4);
 
+	set_sprite_tile(2, airenemy.frame + airenemy.drop);
+	set_sprite_tile(3, airenemy.frame + airenemy.drop + 2);
+
+	if (airenemy.drop > 0 && !airenemy.exploding)
+		set_sprite_tile(4, 26);
+	else if (!airenemy.exploding)
+		set_sprite_tile(4, 24);
+	else
+		set_sprite_tile(4, bombframe);
+
 	movesprites();
 	animatesprites();
 }
 
 void loadbkg() {
 
-	set_bkg_data(1, 1, bkgdata);
+	set_bkg_data(1, 2, bkgdata);
 
 	drawbkg();
 
@@ -145,6 +220,20 @@ void loadsprites() {
 
 	set_sprite_data(4, 8, Shadow);
 
+	set_sprite_data(8, 24, enRobot);
+
+	airenemy.x = 40;
+	airenemy.y = 8;
+	airenemy.frame = 8;
+	airenemy.totalframes = 16;
+	airenemy.drop = 0;
+	airenemy.left = false;
+	airenemy.bombx = airenemy.x;
+	airenemy.bomby = airenemy.y;
+	airenemy.exploding = false;
+
+	set_sprite_data(24, 32, Bomb);
+
 	drawsprites();
 
 	SHOW_SPRITES;
@@ -154,6 +243,17 @@ void loadsprites() {
 */
 void process() {
 	scroll_bkg(2, 0);
+
+	if (airenemy.left)
+		airenemy.x -= SPEED;
+	else
+		airenemy.x += SPEED;
+
+	if (airenemy.x < 10)
+		airenemy.left = false;
+
+	if (airenemy.x > 130)
+		airenemy.left = true;
 }
 
 /* process the input 
@@ -187,6 +287,10 @@ void processinput(bool* keys) {
 		apressed = true;
 	} else {
 		apressed = false;
+	}
+
+	if (keys[5]) {
+		airenemy.drop = 8;
 	}
 
 	if (!keys[0] && !keys[1]) {
