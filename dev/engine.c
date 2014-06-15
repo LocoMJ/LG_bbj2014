@@ -4,12 +4,14 @@
 typedef enum {false, true} bool;
 
 const int JUMPFORCE = 3;
+const int SPEED = 1;
 
 bool apressed;
 
 struct player {
 	int x; // x axis position of the sprite
 	int y; // y axis position of the sprite
+	int realy; // real y axis position of the sprite
 	int frame; // actual frame
 	int totalframes; // frames of the animation
 	bool inair;
@@ -64,13 +66,14 @@ void movesprites() {
 			philip.x -= disx;
 		else
 			philip.x += -disx;
-	}	
+	}
 
-	if (philip.y > 127) {
-		if (disy >=0)
-			philip.y -= disy;
-		else
-			philip.y += -disy;
+	if (philip.realy > 127) {
+		philip.y -= SPEED;
+		philip.realy = 127;
+	} else if(philip.realy < 92) {
+		philip.y += SPEED;
+		philip.realy = 92;
 	}
 
 	move_sprite(0, philip.x + 8, philip.y + 16);
@@ -128,6 +131,7 @@ void loadsprites() {
 
 	philip.x = 40;
 	philip.y = 120;
+	philip.realy = 120;
 	philip.frame = 2;
 	philip.totalframes = 4;
 	philip.inair = false;
@@ -142,22 +146,21 @@ void loadsprites() {
 void processinput(bool* keys) {
 
 	if (keys[0]) { // left
-		disx = - 1;
+		disx = - SPEED;
 	}
 
 	if (keys[1]) { // right
-		disx = 1;
+		disx = SPEED;
 	}
 
 	if (keys[2]) { // up
-		if (philip.y >= 92)
-			disy = - 1;
-		else
-			disy = 0;
+		disy = - SPEED;
+		philip.realy -= -disy;
 	}
 
 	if (keys[3]) { // down
-		disy = 1;
+		disy = SPEED;
+		philip.realy += disy;
 	}
 
 	if (keys[4]) { // a
