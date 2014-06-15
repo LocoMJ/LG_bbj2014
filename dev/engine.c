@@ -78,7 +78,7 @@ void movesprites() {
 
 	move_sprite(0, philip.x + 8, philip.y + 16);
 	
-	move_sprite(1, philip.x + 8, philip.realy + 16);
+	move_sprite(1, philip.x + 8, philip.realy + 17);
 
 }
 
