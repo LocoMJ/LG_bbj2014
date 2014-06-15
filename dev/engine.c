@@ -77,6 +77,8 @@ void movesprites() {
 	}
 
 	move_sprite(0, philip.x + 8, philip.y + 16);
+	
+	move_sprite(1, philip.x + 8, philip.realy + 16);
 
 }
 
@@ -101,7 +103,7 @@ void animatesprites() {
 void drawbkg() {
 	int i, j;
 
-	for (i = 0; i < 20; i++)
+	for (i = 0; i < 32; i++)
 		for (j = 0; j < 13; j++)
 			set_bkg_tiles(i, j, 1, 1, track);
 }
@@ -109,6 +111,11 @@ void drawbkg() {
 void drawsprites() {
 
 	set_sprite_tile(0, philip.frame);
+
+	if (philip.realy - philip.y > 14)
+		set_sprite_tile(1, 6);
+	else
+		set_sprite_tile(1, 4);
 
 	movesprites();
 	animatesprites();
@@ -136,9 +143,17 @@ void loadsprites() {
 	philip.totalframes = 4;
 	philip.inair = false;
 
+	set_sprite_data(4, 8, Shadow);
+
 	drawsprites();
 
 	SHOW_SPRITES;
+}
+
+/* Process the changes in the environment
+*/
+void process() {
+	scroll_bkg(2, 0);
 }
 
 /* process the input 

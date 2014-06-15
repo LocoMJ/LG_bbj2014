@@ -88,6 +88,8 @@ void main() {
 
 		drawsprites();
 
+		process();
+
 		delay(PERFRAME);
 
 	}
