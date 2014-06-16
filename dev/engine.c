@@ -43,6 +43,7 @@ int framecounter = 0; // iterations per frame
 int enframecounter = 0;
 int explosioncounter = 0;
 const int ITERPFRAME = 5;
+const int ITERPFRAMEBOMB = 3;
 
 int jumpcounter = 0; // iterations per jump aceleration
 const int ITERPJUMP = 3;
@@ -101,21 +102,22 @@ void movesprites() {
 	move_sprite(2, airenemy.x + 8, airenemy.y + 17);
 	move_sprite(3, airenemy.x + 16, airenemy.y + 17);
 
+	move_sprite(4, airenemy.bombx + 12, airenemy.bomby + 17);
+	move_sprite(5, airenemy.bombx + 12, airenemy.bomby + 33);
+
 	if (airenemy.drop == 0) {
 		airenemy.bombx = airenemy.x;
 		airenemy.bomby = airenemy.y;
 	} else if (!airenemy.exploding) {
 		airenemy.bomby += 2;
 
-		if (airenemy.bomby > 108) {
+		if (airenemy.bomby > 111) {
 			airenemy.exploding = true;
-			airenemy.bomby += 4;
+			airenemy.bomby -= 5;
 		}
-	} else {
+	} else
 		airenemy.bombx -= SPEED * 3;
-	}
 
-	move_sprite(4, airenemy.bombx + 12, airenemy.bomby + 17);
 }
 
 void animatesprites() {
@@ -145,9 +147,9 @@ void animatesprites() {
 	if (airenemy.exploding) {
 		explosioncounter++;
 
-		if (explosioncounter >= ITERPFRAME) {
-			bombframe += 2;
-			if (bombframe >= 34) {
+		if (explosioncounter >= ITERPFRAMEBOMB) {
+			bombframe += 4;
+			if (bombframe >= 44) {
 				bombframe = 28;
 				airenemy.exploding = false;
 				airenemy.drop = false;
@@ -185,12 +187,16 @@ void drawsprites() {
 	set_sprite_tile(2, airenemy.frame + airenemy.drop);
 	set_sprite_tile(3, airenemy.frame + airenemy.drop + 2);
 
-	if (airenemy.drop > 0 && !airenemy.exploding)
+	if (airenemy.drop > 0 && !airenemy.exploding) {
 		set_sprite_tile(4, 26);
-	else if (!airenemy.exploding)
+		set_sprite_tile(5, 24);
+	} else if (!airenemy.exploding) {
 		set_sprite_tile(4, 24);
-	else
+		set_sprite_tile(5, 24);
+	} else {
 		set_sprite_tile(4, bombframe);
+		set_sprite_tile(5, bombframe + 2);
+	}
 
 	movesprites();
 	animatesprites();
@@ -232,7 +238,7 @@ void loadsprites() {
 	airenemy.bomby = airenemy.y;
 	airenemy.exploding = false;
 
-	set_sprite_data(24, 32, Bomb);
+	set_sprite_data(24, 44, Bomb);
 
 	drawsprites();
 
