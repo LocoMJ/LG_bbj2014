@@ -3,6 +3,7 @@
 #include <rand.h>
 #include <gb/gb.h>
 #include <gb/console.h>
+#include "utils.c"
 #include "engine.c"
 
 #define PERFRAME 34 // milliseconds per iteration (34)

@@ -3,8 +3,12 @@
 
 typedef enum {false, true} bool;
 
+int DIFFICULTY = 2;
+int SPEED = 2;
+
+const int PLAYERSPEED = 1;
+
 const int JUMPFORCE = 3;
-const int SPEED = 1;
 
 bool apressed;
 
@@ -35,6 +39,16 @@ static struct enemy airenemy;
 
 int bombframe = 28;
 
+struct danger {
+	int x;
+	int y;
+	int set;
+}
+
+static struct danger spike0;
+static struct danger spike1;
+static struct danger spike2;
+
 int disx = 0; // x axis displacement of the sprite
 int disy = 0; // y axis displacement of the sprite
 int disjump = 0; // jump distance
@@ -49,6 +63,8 @@ int jumpcounter = 0; // iterations per jump aceleration
 const int ITERPJUMP = 3;
 
 int dropcounter = 150;
+
+int setcounter = 30;
 
 void movesprites() {
 
@@ -89,12 +105,12 @@ void movesprites() {
 			philip.x += -disx;
 	}
 
-	if (philip.realy > 127) {
-		philip.y -= SPEED;
-		philip.realy = 127;
-	} else if(philip.realy < 92) {
-		philip.y += SPEED;
-		philip.realy = 92;
+	if (philip.realy > 123) {
+		philip.y -= PLAYERSPEED;
+		philip.realy = 123;
+	} else if(philip.realy < 96) {
+		philip.y += PLAYERSPEED;
+		philip.realy = 96;
 	}
 
 	move_sprite(0, philip.x + 8, philip.y + 16);
@@ -118,7 +134,20 @@ void movesprites() {
 			airenemy.bomby -= 5;
 		}
 	} else
-		airenemy.bombx -= SPEED * 4;
+		airenemy.bombx -= SPEED * 2;
+
+	if (spike0.set > 0)
+		spike0.x -= SPEED * 2;
+
+	if (spike1.set > 0)
+		spike1.x -= SPEED * 2;
+
+	if (spike2.set > 0)
+		spike2.x -= SPEED * 2;
+
+	move_sprite(6, spike0.x, spike0.y);	
+	move_sprite(7, spike1.x, spike1.y);	
+	move_sprite(8, spike2.x, spike2.y);	
 
 }
 
@@ -200,6 +229,10 @@ void drawsprites() {
 		set_sprite_tile(5, bombframe + 2);
 	}
 
+	set_sprite_tile(6, 44 + spike0.set);
+	set_sprite_tile(7, 44 + spike1.set);
+	set_sprite_tile(8, 44 + spike2.set);
+
 	movesprites();
 	animatesprites();
 }
@@ -242,6 +275,20 @@ void loadsprites() {
 
 	set_sprite_data(24, 44, Bomb);
 
+	set_sprite_data(44, 48, Spikes);
+
+	spike0.x = 160;
+	spike0.y = 50;
+	spike0.set = 0;
+
+	spike1.x = 160;
+	spike1.y = 50;
+	spike1.set = 0;
+
+	spike2.x = 160;
+	spike2.y = 50;
+	spike2.set = 0;
+
 	drawsprites();
 
 	SHOW_SPRITES;
@@ -253,9 +300,9 @@ void process() {
 	scroll_bkg(2, 0);
 
 	if (airenemy.left)
-		airenemy.x -= SPEED;
+		airenemy.x -= SPEED/2;
 	else
-		airenemy.x += SPEED;
+		airenemy.x += SPEED/2;
 
 	if (airenemy.x < 10)
 		airenemy.left = false;
@@ -271,9 +318,49 @@ void process() {
 		if (dropcounter <= 0) {
 			airenemy.drop = 8;
 			do {
-				dropcounter = rand();
+				dropcounter = rand() / DIFFICULTY;
 			} while (dropcounter <= 0);
 		}
+	}
+
+	if (spike0.x < 0) {
+		spike0.x = 160;
+		spike0.y = 50;
+		spike0.set = 0;
+	}
+
+	if (spike1.x < 0){
+		spike1.x = 160;
+		spike1.y = 50;
+		spike1.set = 0;
+	}
+
+	if (spike2.x < 0){
+		spike2.x = 160;
+		spike2.y = 50;
+		spike2.set = 0;
+	}
+
+	setcounter -= 1;
+
+	if (setcounter <= 0) {
+		if (spike0.set == 0) {
+			spike0.y = 120 + abs(rand()%17);
+			spike0.x = 160;
+			spike0.set = 2;
+		} else if (spike1.set == 0) {
+			spike1.y = 120 + abs(rand()%17);
+			spike1.x = 160;
+			spike1.set = 2;
+		} else if (spike2.set == 0) {
+			spike2.y = 120 + abs(rand()%17);
+			spike2.x = 160;
+			spike2.set = 2;
+		}
+
+		do {
+			setcounter = rand() / 2 / DIFFICULTY;
+		} while (setcounter <= 0);
 	}
 	
 }
@@ -283,20 +370,20 @@ void process() {
 void processinput(bool* keys) {
 
 	if (keys[0]) { // left
-		disx = - SPEED;
+		disx = - PLAYERSPEED;
 	}
 
 	if (keys[1]) { // right
-		disx = SPEED;
+		disx = PLAYERSPEED;
 	}
 
 	if (keys[2]) { // up
-		disy = - SPEED;
+		disy = - PLAYERSPEED;
 		philip.realy -= -disy;
 	}
 
 	if (keys[3]) { // down
-		disy = SPEED;
+		disy = PLAYERSPEED;
 		philip.realy += disy;
 	}
 
