@@ -277,15 +277,15 @@ void loadsprites() {
 
 	set_sprite_data(44, 48, Spikes);
 
-	spike0.x = 160;
+	spike0.x = 168;
 	spike0.y = 50;
 	spike0.set = 0;
 
-	spike1.x = 160;
+	spike1.x = 168;
 	spike1.y = 50;
 	spike1.set = 0;
 
-	spike2.x = 160;
+	spike2.x = 168;
 	spike2.y = 50;
 	spike2.set = 0;
 
@@ -297,7 +297,7 @@ void loadsprites() {
 /* Process the changes in the environment
 */
 void process() {
-	scroll_bkg(2, 0);
+	scroll_bkg(SPEED, 0);
 
 	if (airenemy.left)
 		airenemy.x -= SPEED/2;
@@ -324,19 +324,19 @@ void process() {
 	}
 
 	if (spike0.x < 0) {
-		spike0.x = 160;
+		spike0.x = 168;
 		spike0.y = 50;
 		spike0.set = 0;
 	}
 
 	if (spike1.x < 0){
-		spike1.x = 160;
+		spike1.x = 168;
 		spike1.y = 50;
 		spike1.set = 0;
 	}
 
 	if (spike2.x < 0){
-		spike2.x = 160;
+		spike2.x = 168;
 		spike2.y = 50;
 		spike2.set = 0;
 	}
@@ -346,15 +346,15 @@ void process() {
 	if (setcounter <= 0) {
 		if (spike0.set == 0) {
 			spike0.y = 120 + abs(rand()%17);
-			spike0.x = 160;
+			spike0.x = 168;
 			spike0.set = 2;
 		} else if (spike1.set == 0) {
 			spike1.y = 120 + abs(rand()%17);
-			spike1.x = 160;
+			spike1.x = 168;
 			spike1.set = 2;
 		} else if (spike2.set == 0) {
 			spike2.y = 120 + abs(rand()%17);
-			spike2.x = 160;
+			spike2.x = 168;
 			spike2.set = 2;
 		}
 
