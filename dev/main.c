@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <rand.h>
 #include <gb/gb.h>
 #include <gb/console.h>
 #include "engine.c"
@@ -76,6 +77,8 @@ void recordinput(int key) {
 
 /* main program */
 void main() {
+
+	initrand(23); 
 
 	loadbkg();
 

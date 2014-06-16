@@ -48,6 +48,8 @@ const int ITERPFRAMEBOMB = 3;
 int jumpcounter = 0; // iterations per jump aceleration
 const int ITERPJUMP = 3;
 
+int dropcounter = 150;
+
 void movesprites() {
 
 	if (philip.inair) {
@@ -116,7 +118,7 @@ void movesprites() {
 			airenemy.bomby -= 5;
 		}
 	} else
-		airenemy.bombx -= SPEED * 3;
+		airenemy.bombx -= SPEED * 4;
 
 }
 
@@ -258,8 +260,22 @@ void process() {
 	if (airenemy.x < 10)
 		airenemy.left = false;
 
-	if (airenemy.x > 130)
+	if (airenemy.x > 135)
 		airenemy.left = true;
+
+	
+	if (airenemy.drop == 0) {
+
+		dropcounter -= 1;
+
+		if (dropcounter <= 0) {
+			airenemy.drop = 8;
+			do {
+				dropcounter = rand();
+			} while (dropcounter <= 0);
+		}
+	}
+	
 }
 
 /* process the input 
@@ -294,11 +310,7 @@ void processinput(bool* keys) {
 	} else {
 		apressed = false;
 	}
-
-	if (keys[5]) {
-		airenemy.drop = 8;
-	}
-
+	
 	if (!keys[0] && !keys[1]) {
 		disx = 0;
 	}
