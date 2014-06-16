@@ -345,15 +345,15 @@ void process() {
 
 	if (setcounter <= 0) {
 		if (spike0.set == 0) {
-			spike0.y = 120 + abs(rand()%17);
+			spike0.y = 120 + abs(rand()%25);
 			spike0.x = 168;
 			spike0.set = 2;
 		} else if (spike1.set == 0) {
-			spike1.y = 120 + abs(rand()%17);
+			spike1.y = 120 + abs(rand()%25);
 			spike1.x = 168;
 			spike1.set = 2;
 		} else if (spike2.set == 0) {
-			spike2.y = 120 + abs(rand()%17);
+			spike2.y = 120 + abs(rand()%25);
 			spike2.x = 168;
 			spike2.set = 2;
 		}
