@@ -406,3 +406,16 @@ void processinput(bool* keys) {
 		disy = 0;
 	}
 }
+
+void checkcollisions() {
+
+	if (((philip.x + 16 > spike0.x && philip.x + 8 < spike0.x + 8 &&
+		philip.y + 32 > spike0.y && philip.y + 12 < spike0.y) ||
+		(philip.x + 16 > spike1.x && philip.x + 8 < spike1.x + 8 &&
+		philip.y + 32 > spike1.y && philip.y + 12 < spike1.y) ||
+		(philip.x + 16 > spike2.x && philip.x + 8 < spike2.x + 8 &&
+		philip.y + 32 > spike2.y && philip.y + 12 < spike2.y) ||
+		(airenemy.exploding && philip.x > airenemy.bombx && philip.x < airenemy.bombx + 12)
+		) && philip.realy - philip.y < 3)
+		printf("Golpe!\n");
+}

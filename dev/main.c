@@ -90,9 +90,11 @@ void main() {
 
 		recordinput(joypad());
 
+		process();
+
 		drawsprites();
 
-		process();
+		checkcollisions();
 
 		delay(PERFRAME);
 
