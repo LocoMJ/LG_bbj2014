@@ -76,10 +76,10 @@ void recordinput(int key) {
 	processinput(keys);
 }
 
-/* main program */
-void main() {
-
+void game() {
 	initrand(23); 
+
+	initialize();
 
 	loadbkg();
 
@@ -90,13 +90,24 @@ void main() {
 
 		recordinput(joypad());
 
-		process();
+		if (!pause) {
+			movesprites();
+
+			animatesprites();
+
+			process();
+
+			checkcollisions();
+		}
 
 		drawsprites();
-
-		checkcollisions();
 
 		delay(PERFRAME);
 
 	}
+}
+
+/* main program */
+void main() {
+	game();
 }

@@ -11,6 +11,8 @@ const int PLAYERSPEED = 1;
 const int JUMPFORCE = 3;
 
 bool apressed;
+bool startpressed;
+bool pause;
 
 struct player {
 	int x; // x axis position of the sprite
@@ -19,6 +21,7 @@ struct player {
 	int frame; // actual frame
 	int totalframes; // frames of the animation
 	bool inair;
+	bool dead;
 };
 
 static struct player philip;
@@ -37,7 +40,7 @@ struct enemy {
 
 static struct enemy airenemy;
 
-int bombframe = 28;
+int bombframe;
 
 struct danger {
 	int x;
@@ -49,22 +52,78 @@ static struct danger spike0;
 static struct danger spike1;
 static struct danger spike2;
 
-int disx = 0; // x axis displacement of the sprite
-int disy = 0; // y axis displacement of the sprite
-int disjump = 0; // jump distance
+int disx; // x axis displacement of the sprite
+int disy; // y axis displacement of the sprite
+int disjump; // jump distance
 
-int framecounter = 0; // iterations per frame
-int enframecounter = 0;
-int explosioncounter = 0;
+int framecounter; // iterations per frame
+int enframecounter;
+int explosioncounter;
 const int ITERPFRAME = 5;
 const int ITERPFRAMEBOMB = 3;
 
-int jumpcounter = 0; // iterations per jump aceleration
+int jumpcounter; // iterations per jump aceleration
 const int ITERPJUMP = 3;
 
-int dropcounter = 150;
+int dropcounter;
 
-int setcounter = 30;
+int setcounter;
+
+void initialize() {
+
+	philip.x = 40;
+	philip.y = 120;
+	philip.realy = 120;
+	philip.frame = 2;
+	philip.totalframes = 4;
+	philip.inair = false;
+	philip.dead = false;
+
+	airenemy.x = 40;
+	airenemy.y = 8;
+	airenemy.frame = 12;
+	airenemy.totalframes = 20;
+	airenemy.drop = 0;
+	airenemy.left = false;
+	airenemy.bombx = airenemy.x;
+	airenemy.bomby = airenemy.y;
+	airenemy.exploding = false;
+
+	spike0.x = 168;
+	spike0.y = 50;
+	spike0.set = 0;
+
+	spike1.x = 168;
+	spike1.y = 50;
+	spike1.set = 0;
+
+	spike2.x = 168;
+	spike2.y = 50;
+	spike2.set = 0;
+
+
+	DIFFICULTY = 2;
+	SPEED = 2;
+
+	apressed = false;
+	startpressed = false;
+	pause = false;
+
+	bombframe = 32;
+
+	disx = 0;
+	disy = 0;
+	disjump = 0;
+
+	framecounter = 0;
+	enframecounter = 0;
+	explosioncounter = 0;
+	jumpcounter = 0;
+
+	dropcounter = 150;
+	setcounter = 30;
+
+}
 
 void movesprites() {
 
@@ -114,7 +173,7 @@ void movesprites() {
 	}
 
 	move_sprite(0, philip.x + 8, philip.y + 16);
-	
+
 	move_sprite(1, philip.x + 8, philip.realy + 17);
 
 	move_sprite(2, airenemy.x + 8, airenemy.y + 17);
@@ -157,7 +216,7 @@ void animatesprites() {
 
 	if (framecounter >= ITERPFRAME) {
 		philip.frame += 2;
-	
+
 		if (philip.frame >= philip.totalframes)
 			philip.frame = 0;
 
@@ -170,7 +229,7 @@ void animatesprites() {
 		airenemy.frame += 4;
 
 		if (airenemy.frame >= airenemy.totalframes)
-			airenemy.frame = 8;
+			airenemy.frame = 12;
 
 		enframecounter = 0;
 	}
@@ -180,8 +239,8 @@ void animatesprites() {
 
 		if (explosioncounter >= ITERPFRAMEBOMB) {
 			bombframe += 4;
-			if (bombframe >= 44) {
-				bombframe = 28;
+			if (bombframe >= 48) {
+				bombframe = 32;
 				airenemy.exploding = false;
 				airenemy.drop = false;
 			}
@@ -211,30 +270,50 @@ void drawsprites() {
 	set_sprite_tile(0, philip.frame);
 
 	if (philip.realy - philip.y > 14)
-		set_sprite_tile(1, 6);
+		set_sprite_tile(1, 10);
 	else
-		set_sprite_tile(1, 4);
+		set_sprite_tile(1, 8);
 
 	set_sprite_tile(2, airenemy.frame + airenemy.drop);
 	set_sprite_tile(3, airenemy.frame + airenemy.drop + 2);
 
 	if (airenemy.drop > 0 && !airenemy.exploding) {
-		set_sprite_tile(4, 26);
-		set_sprite_tile(5, 24);
+		set_sprite_tile(4, 30);
+		set_sprite_tile(5, 28);
 	} else if (!airenemy.exploding) {
-		set_sprite_tile(4, 24);
-		set_sprite_tile(5, 24);
+		set_sprite_tile(4, 28);
+		set_sprite_tile(5, 28);
 	} else {
 		set_sprite_tile(4, bombframe);
 		set_sprite_tile(5, bombframe + 2);
 	}
 
-	set_sprite_tile(6, 44 + spike0.set);
-	set_sprite_tile(7, 44 + spike1.set);
-	set_sprite_tile(8, 44 + spike2.set);
+	set_sprite_tile(6, 48 + spike0.set);
+	set_sprite_tile(7, 48 + spike1.set);
+	set_sprite_tile(8, 48 + spike2.set);
 
-	movesprites();
-	animatesprites();
+	if (philip.dead) {
+
+		disy += disjump;
+
+		jumpcounter++;
+
+		if (jumpcounter >= ITERPJUMP) {
+			disjump += 1;
+			jumpcounter = 0;
+		}
+
+		if (disy >=0)
+			philip.y += disy;
+		else
+			philip.y -= -disy;
+
+		move_sprite(0, philip.x + 8, philip.y + 16);
+
+		if (disjump > JUMPFORCE * 3)
+			initialize();
+
+	}
 }
 
 void loadbkg() {
@@ -250,46 +329,15 @@ void loadsprites() {
 
 	SPRITES_8x16;
 
-	set_sprite_data(0, 4, SuperPhilip);
+	set_sprite_data(0, 8, SuperPhilip);
 
-	philip.x = 40;
-	philip.y = 120;
-	philip.realy = 120;
-	philip.frame = 2;
-	philip.totalframes = 4;
-	philip.inair = false;
+	set_sprite_data(8, 12, Shadow);
 
-	set_sprite_data(4, 8, Shadow);
+	set_sprite_data(12, 28, enRobot);
 
-	set_sprite_data(8, 24, enRobot);
+	set_sprite_data(28, 48, Bomb);
 
-	airenemy.x = 40;
-	airenemy.y = 8;
-	airenemy.frame = 8;
-	airenemy.totalframes = 16;
-	airenemy.drop = 0;
-	airenemy.left = false;
-	airenemy.bombx = airenemy.x;
-	airenemy.bomby = airenemy.y;
-	airenemy.exploding = false;
-
-	set_sprite_data(24, 44, Bomb);
-
-	set_sprite_data(44, 48, Spikes);
-
-	spike0.x = 168;
-	spike0.y = 50;
-	spike0.set = 0;
-
-	spike1.x = 168;
-	spike1.y = 50;
-	spike1.set = 0;
-
-	spike2.x = 168;
-	spike2.y = 50;
-	spike2.set = 0;
-
-	drawsprites();
+	set_sprite_data(48, 52, Spikes);
 
 	SHOW_SPRITES;
 }
@@ -310,7 +358,7 @@ void process() {
 	if (airenemy.x > 135)
 		airenemy.left = true;
 
-	
+
 	if (airenemy.drop == 0) {
 
 		dropcounter -= 1;
@@ -362,7 +410,7 @@ void process() {
 			setcounter = rand() / 2 / DIFFICULTY;
 		} while (setcounter <= 0);
 	}
-	
+
 }
 
 /* process the input 
@@ -397,7 +445,7 @@ void processinput(bool* keys) {
 	} else {
 		apressed = false;
 	}
-	
+
 	if (!keys[0] && !keys[1]) {
 		disx = 0;
 	}
@@ -405,6 +453,35 @@ void processinput(bool* keys) {
 	if (!keys[2] && !keys[3]) {
 		disy = 0;
 	}
+
+	if (keys[6]) {
+		
+		if (!startpressed && !philip.dead)
+			if (!pause)
+				pause = true;
+			else
+				pause = false;
+
+		startpressed = true;
+	} else {
+		startpressed = false;
+	}
+
+}
+
+void death() {
+
+	philip.dead = true;
+
+	pause = true;
+
+	philip.frame = 4;
+
+	disjump = -JUMPFORCE * 2;
+
+	jumpcounter = 0;
+
+	move_sprite(1, 160, 160);
 }
 
 void checkcollisions() {
@@ -417,5 +494,5 @@ void checkcollisions() {
 		philip.y + 32 > spike2.y && philip.y + 12 < spike2.y) ||
 		(airenemy.exploding && philip.x > airenemy.bombx && philip.x < airenemy.bombx + 12)
 		) && philip.realy - philip.y < 3)
-		printf("Golpe!\n");
+		death();
 }
