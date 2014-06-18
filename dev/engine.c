@@ -417,46 +417,53 @@ void process() {
 @param keys: array with a list of boolean values that dictates the keys pressed*/
 void processinput(bool* keys) {
 
-	if (keys[0]) { // left
-		disx = - PLAYERSPEED;
-	}
+	if (!pause) {
 
-	if (keys[1]) { // right
-		disx = PLAYERSPEED;
-	}
-
-	if (keys[2]) { // up
-		disy = - PLAYERSPEED;
-		philip.realy -= -disy;
-	}
-
-	if (keys[3]) { // down
-		disy = PLAYERSPEED;
-		philip.realy += disy;
-	}
-
-	if (keys[4]) { // a
-		if (!philip.inair && !apressed) {
-			philip.inair = true;
-			disjump = - JUMPFORCE;
+		if (keys[0]) { // left
+			disx = - PLAYERSPEED;
 		}
 
-		apressed = true;
+		if (keys[1]) { // right
+			disx = PLAYERSPEED;
+		}
+
+		if (keys[2]) { // up
+			disy = - PLAYERSPEED;
+			philip.realy -= -disy;
+		}
+
+		if (keys[3]) { // down
+			disy = PLAYERSPEED;
+			philip.realy += disy;
+		}
+
+		if (keys[4]) { // a
+			if (!philip.inair && !apressed) {
+				philip.inair = true;
+				disjump = - JUMPFORCE;
+			}
+
+			apressed = true;
+		} else {
+			apressed = false;
+		}
+
+		if (!keys[0] && !keys[1]) {
+			disx = 0;
+		}
+
+		if (!keys[2] && !keys[3]) {
+			disy = 0;
+		}
+
 	} else {
-		apressed = false;
-	}
-
-	if (!keys[0] && !keys[1]) {
 		disx = 0;
-	}
-
-	if (!keys[2] && !keys[3]) {
 		disy = 0;
 	}
 
 	if (keys[6]) {
 		
-		if (!startpressed && !philip.dead)
+		if (!startpressed)
 			if (!pause)
 				pause = true;
 			else
@@ -482,6 +489,7 @@ void death() {
 	jumpcounter = 0;
 
 	move_sprite(1, 160, 160);
+
 }
 
 void checkcollisions() {

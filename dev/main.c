@@ -91,6 +91,7 @@ void game() {
 		recordinput(joypad());
 
 		if (!pause) {
+
 			movesprites();
 
 			animatesprites();
