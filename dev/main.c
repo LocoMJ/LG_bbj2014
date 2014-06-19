@@ -3,6 +3,7 @@
 #include <rand.h>
 #include <gb/gb.h>
 #include <gb/console.h>
+#include <gb/sample.h>
 #include "utils.c"
 #include "map.c"
 #include "engine.c"

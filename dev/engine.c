@@ -3,8 +3,8 @@
 
 typedef enum {false, true} bool;
 
-int DIFFICULTY = 2;
-int SPEED = 2;
+int DIFFICULTY;
+int SPEED;
 
 const int PLAYERSPEED = 1;
 
@@ -69,6 +69,9 @@ int dropcounter;
 
 int setcounter;
 
+int difcounter;
+int level;
+
 void initialize() {
 
 	philip.x = 40;
@@ -122,6 +125,9 @@ void initialize() {
 
 	dropcounter = 150;
 	setcounter = 30;
+
+	difcounter = 0;
+	level = 0;
 
 }
 
@@ -179,9 +185,6 @@ void movesprites() {
 	move_sprite(2, airenemy.x + 8, airenemy.y + 17);
 	move_sprite(3, airenemy.x + 16, airenemy.y + 17);
 
-	move_sprite(4, airenemy.bombx + 12, airenemy.bomby + 17);
-	move_sprite(5, airenemy.bombx + 12, airenemy.bomby + 33);
-
 	if (airenemy.drop == 0) {
 		airenemy.bombx = airenemy.x;
 		airenemy.bomby = airenemy.y;
@@ -194,6 +197,9 @@ void movesprites() {
 		}
 	} else
 		airenemy.bombx -= SPEED * 2;
+
+	move_sprite(4, airenemy.bombx + 12, airenemy.bomby + 17);
+	move_sprite(5, airenemy.bombx + 12, airenemy.bomby + 33);
 
 	if (spike0.set > 0)
 		spike0.x -= SPEED * 2;
@@ -403,6 +409,24 @@ void process() {
 		do {
 			setcounter = rand() / 2 / DIFFICULTY;
 		} while (setcounter <= 0);
+	}
+
+
+	if (level <= 20) {
+
+		difcounter++;
+
+		if (difcounter >= 450) {
+			difcounter = 0;
+			level++;
+			if (level % 4 == 0) {
+				SPEED++;
+				DIFFICULTY -= 2;
+			} else {
+				DIFFICULTY++;
+			}
+		}
+
 	}
 
 }
