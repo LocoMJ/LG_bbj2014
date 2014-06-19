@@ -255,14 +255,8 @@ void animatesprites() {
 }
 
 void drawbkg() {
-	int i, j;
 
-	for (i = 0; i < 32; i++)
-		for (j = 4; j < 12; j++)
-			set_bkg_tiles(i, j, 1, 1, track);
-
-	for (i = 0; i < 32; i++)	
-		set_bkg_tiles(i, 12, 1, 1, borde);
+	set_bkg_tiles(0, 3, MWIDTH, MHEIGHT, city);
 }
 
 void drawsprites() {
@@ -318,7 +312,7 @@ void drawsprites() {
 
 void loadbkg() {
 
-	set_bkg_data(1, 2, bkgdata);
+	set_bkg_data(1, 5, bkgdata);
 
 	drawbkg();
 
