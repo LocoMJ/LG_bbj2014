@@ -10,6 +10,8 @@
 
 #define PERFRAME 34 // milliseconds per iteration (34)
 
+int seed = 0;
+
 /* keys pressed (true) or not (false)
 0: LEFT
 1: RIGHT
@@ -79,11 +81,32 @@ void recordinput(int key) {
 }
 
 void game() {
-	initrand(23); 
+
+	myCls();
+
+	gotoxy(4, 4);
+	printf("Super Philip\n");
+
+	gotoxy(4, 8);
+	printf("PRESS START\n");
+
+	gotoxy(0, 12);
+	printf("Light Games:\n");
+	printf("Imanolea, LocoMJ");
+
+	gotoxy(10, 15);
+	printf("BitBitJam\n");
+
+	while(!(joypad() & J_START)) {
+		seed++;
+	}
+
+	initrand(seed); 
 
 	initialize();
 
 	loadbkg();
+	SHOW_BKG;
 
 	loadsprites();
 

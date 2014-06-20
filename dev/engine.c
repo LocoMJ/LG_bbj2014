@@ -72,63 +72,33 @@ int setcounter;
 int difcounter;
 int level;
 
-void initialize() {
+int scroll = 0;
 
-	philip.x = 40;
-	philip.y = 120;
-	philip.realy = 120;
-	philip.frame = 2;
-	philip.totalframes = 4;
-	philip.inair = false;
-	philip.dead = false;
+int scorecounter;
+int score;
 
-	airenemy.x = 40;
-	airenemy.y = 8;
-	airenemy.frame = 12;
-	airenemy.totalframes = 20;
-	airenemy.drop = 0;
-	airenemy.left = false;
-	airenemy.bombx = airenemy.x;
-	airenemy.bomby = airenemy.y;
-	airenemy.exploding = false;
+void myCls()
+{                                
+	int x, y;
 
-	spike0.x = 168;
-	spike0.y = 50;
-	spike0.set = 0;
+	for(y = 0; y < 20; y++)        
+    	for(x = 0; x < 30; x++) {    
+    		gotoxy(x, y);             
+     		setchar(' ');             
+    	}                          
+	gotoxy(0,0);                     
+}
 
-	spike1.x = 168;
-	spike1.y = 50;
-	spike1.set = 0;
+void drawbkg() {
 
-	spike2.x = 168;
-	spike2.y = 50;
-	spike2.set = 0;
+	set_bkg_tiles(0, 0, MWIDTH, MHEIGHT, city);
+}
 
+void loadbkg() {
 
-	DIFFICULTY = 2;
-	SPEED = 2;
+	set_bkg_data(1, 5, bkgdata);
 
-	apressed = false;
-	startpressed = false;
-	pause = false;
-
-	bombframe = 32;
-
-	disx = 0;
-	disy = 0;
-	disjump = 0;
-
-	framecounter = 0;
-	enframecounter = 0;
-	explosioncounter = 0;
-	jumpcounter = 0;
-
-	dropcounter = 150;
-	setcounter = 30;
-
-	difcounter = 0;
-	level = 0;
-
+	drawbkg();
 }
 
 void movesprites() {
@@ -260,9 +230,87 @@ void animatesprites() {
 
 }
 
-void drawbkg() {
+void initialize() {
 
-	set_bkg_tiles(0, 3, MWIDTH, MHEIGHT, city);
+	philip.x = 40;
+	philip.y = 120;
+	philip.realy = 120;
+	philip.frame = 2;
+	philip.totalframes = 4;
+	philip.inair = false;
+	philip.dead = false;
+
+	airenemy.x = 40;
+	airenemy.y = 8;
+	airenemy.frame = 12;
+	airenemy.totalframes = 20;
+	airenemy.drop = 0;
+	airenemy.left = false;
+	airenemy.bombx = airenemy.x;
+	airenemy.bomby = airenemy.y;
+	airenemy.exploding = false;
+
+	spike0.x = 168;
+	spike0.y = 50;
+	spike0.set = 0;
+
+	spike1.x = 168;
+	spike1.y = 50;
+	spike1.set = 0;
+
+	spike2.x = 168;
+	spike2.y = 50;
+	spike2.set = 0;
+
+	DIFFICULTY = 2;
+	SPEED = 2;
+
+	apressed = false;
+	startpressed = false;
+	pause = false;
+
+	bombframe = 32;
+
+	disx = 0;
+	disy = 0;
+	disjump = 0;
+
+	framecounter = 0;
+	enframecounter = 0;
+	explosioncounter = 0;
+	jumpcounter = 0;
+
+	dropcounter = 150;
+	setcounter = 30;
+
+	difcounter = 0;
+	level = 0;
+
+	scroll = 0;
+
+	score = 0;
+	scorecounter = 0;
+
+	loadbkg();
+
+	SHOW_SPRITES;
+
+}
+
+void gameover() {
+	HIDE_SPRITES;
+	myCls();
+	scroll_bkg(-scroll, 0);
+
+	gotoxy(5, 6);
+	printf("GAME OVER\n");
+
+	gotoxy(5, 8);
+	printf("Score: %d\n", score);
+
+	while(!(joypad() & J_A) && !(joypad() & J_START)) {}
+
+	initialize();
 }
 
 void drawsprites() {
@@ -310,19 +358,11 @@ void drawsprites() {
 
 		move_sprite(0, philip.x + 8, philip.y + 16);
 
-		if (disjump > JUMPFORCE * 3)
-			initialize();
+		if (disjump > JUMPFORCE * 3) {
+			gameover();
+		}
 
 	}
-}
-
-void loadbkg() {
-
-	set_bkg_data(1, 5, bkgdata);
-
-	drawbkg();
-
-	SHOW_BKG;
 }
 
 void loadsprites() {
@@ -346,6 +386,14 @@ void loadsprites() {
 */
 void process() {
 	scroll_bkg(SPEED, 0);
+	scroll += SPEED;
+
+	scorecounter++;
+
+	if (scorecounter >= 30) {
+		score++;
+		scorecounter = 0;
+	}
 
 	if (airenemy.left)
 		airenemy.x -= SPEED/2;
