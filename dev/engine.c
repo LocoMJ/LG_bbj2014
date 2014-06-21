@@ -77,6 +77,8 @@ int scroll = 0;
 int scorecounter;
 int score;
 
+const unsigned char * const hola = "MTFM";
+
 void myCls()
 {                                
 	int x, y;
@@ -308,7 +310,7 @@ void gameover() {
 	gotoxy(5, 8);
 	printf("Score: %d\n", score);
 
-	while(!(joypad() & J_A) && !(joypad() & J_START)) {}
+	while(!(joypad() & J_A)) {}
 
 	initialize();
 }
@@ -539,6 +541,7 @@ void processinput(bool* keys) {
 	} else {
 		startpressed = false;
 	}
+
 
 }
 
